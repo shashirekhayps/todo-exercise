@@ -36,7 +36,7 @@
       </div>
       <div class="field compact-field">
         <label for="dueDate">Due date</label>
-        <input id="dueDate" name="dueDate" type="date" [(ngModel)]="dueDate" />
+        <input id="dueDate" name="dueDate" type="date" [(ngModel)]="dueDate" [min]="today" />
       </div>
       <button type="submit" [disabled]="todoForm.invalid || saving()">{{ saving() ? 'Adding…' : 'Add task' }}</button>
     </form>

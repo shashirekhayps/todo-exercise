@@ -13,6 +13,7 @@ type SortOption = 'created' | 'priority' | 'dueDate' | 'status';
   styleUrl: './app.scss',
 })
 export class App implements OnInit {
+  protected readonly today = this.toLocalDateInputValue(new Date());
   protected readonly todos = signal<Todo[]>([]);
   protected readonly pendingCount = computed(() => this.todos().filter((todo) => !todo.done).length);
   protected readonly doneCount = computed(() => this.todos().filter((todo) => todo.done).length);
@@ -80,5 +81,12 @@ export class App implements OnInit {
         todos.map((item) => item.id === updated.id ? updated : item)),
       error: () => this.error.set('Could not update the todo.'),
     });
+  }
+
+  private toLocalDateInputValue(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 }
