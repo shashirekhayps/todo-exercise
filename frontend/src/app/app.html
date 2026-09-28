@@ -1,0 +1,86 @@
+<main class="page-shell">
+  <header class="hero">
+    <div>
+      <span class="eyebrow">My workspace</span>
+      <h1>Todo List</h1>
+      <p>Add and manage your daily tasks.</p>
+    </div>
+    <div class="summary" aria-label="Todo summary">
+      <div class="count total"><strong>{{ todos().length }}</strong><span>Total</span></div>
+      <div class="count pending"><strong>{{ pendingCount() }}</strong><span>Pending</span></div>
+      <div class="count done"><strong>{{ doneCount() }}</strong><span>Done</span></div>
+    </div>
+  </header>
+
+  <section class="panel create-panel" aria-labelledby="new-todo-title">
+    <div class="section-heading">
+      <span class="plus">+</span>
+      <div><h2 id="new-todo-title">Add a new task</h2><p>What would you like to accomplish?</p></div>
+    </div>
+    <form (ngSubmit)="createTodo()" #todoForm="ngForm">
+      <div class="field">
+        <label for="title">Title</label>
+        <input id="title" name="title" [(ngModel)]="title" maxlength="100" required placeholder="e.g. Prepare the presentation" />
+      </div>
+      <div class="field">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" [(ngModel)]="description" maxlength="500" required rows="2" placeholder="Add a little more context..."></textarea>
+      </div>
+      <div class="field compact-field">
+        <label for="priority">Priority</label>
+        <select id="priority" name="priority" [(ngModel)]="priority" required>
+          <option value="LOW">Low</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="HIGH">High</option>
+        </select>
+      </div>
+      <div class="field compact-field">
+        <label for="dueDate">Due date</label>
+        <input id="dueDate" name="dueDate" type="date" [(ngModel)]="dueDate" />
+      </div>
+      <button type="submit" [disabled]="todoForm.invalid || saving()">{{ saving() ? 'Adding…' : 'Add task' }}</button>
+    </form>
+  </section>
+
+  @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+
+  <section class="todo-section" aria-labelledby="todo-list-title">
+    <div class="list-heading">
+      <div><span class="eyebrow">Your list</span><h2 id="todo-list-title">Today’s tasks</h2></div>
+      <div class="list-actions">
+        <span class="remaining">{{ pendingCount() }} remaining</span>
+        <label for="sortBy">Sort by</label>
+        <select id="sortBy" name="sortBy" [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)">
+          <option value="created">Created</option>
+          <option value="priority">Priority</option>
+          <option value="dueDate">Due date</option>
+          <option value="status">Status</option>
+        </select>
+      </div>
+    </div>
+    @if (loading()) {
+      <p class="state">Loading your tasks…</p>
+    } @else if (todos().length === 0) {
+      <p class="state">Nothing here yet. Add your first task above.</p>
+    } @else {
+      <div class="todo-list">
+        @for (todo of sortedTodos(); track todo.id) {
+          <article class="todo-card" [class.completed]="todo.done">
+            <button class="check" type="button" [class.checked]="todo.done"
+              [attr.aria-label]="todo.done ? 'Mark ' + todo.title + ' as not done' : 'Mark ' + todo.title + ' as done'"
+              (click)="toggle(todo)">@if (todo.done) { ✓ }</button>
+            <div>
+              <div class="todo-title-row">
+                <h3>{{ todo.title }}</h3>
+                <span class="priority" [class]="'priority ' + todo.priority.toLowerCase()">{{ todo.priority }}</span>
+              </div>
+              <p>{{ todo.description }}</p>
+              @if (todo.dueDate) { <span class="due-date">Due {{ todo.dueDate | date:'mediumDate':'UTC' }}</span> }
+            </div>
+            <span class="status">{{ todo.done ? 'Done' : 'Open' }}</span>
+          </article>
+        }
+      </div>
+    }
+  </section>
+</main>
